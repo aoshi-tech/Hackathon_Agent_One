@@ -1,0 +1,15 @@
+import google.generativeai as genai
+import os
+
+original_symptoms = ''
+final_conclusion = ''
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+# Choose a model
+model = genai.GenerativeModel('gemini-2.5-flash')
+
+# Generate content
+response = model.generate_content(f"Check if these symptoms: {original_symptoms} math with this conclusion: {final_conclusion}. Explain why or why not")
+
+# Print the response
+print(response.text)
