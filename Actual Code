@@ -1,0 +1,69 @@
+import re
+import tkinter as tk
+from tkinter import filedialog
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+
+symptoms = input("Enter how you are feeling: ")
+stop_words = set(stopwords.words('english'))
+word_tokens = word_tokenize(symptoms.lower())
+new_symptoms = [word for word in word_tokens if word not in stop_words]
+final_symptoms = ''
+for symptom in new_symptoms:
+    final_symptoms += symptom + ' '
+level = input("Is it mild, medium, or severe: ")
+scale = input("How bad is it(1-10): ")
+duration = input("How many days have you felt this way: ")
+history = input("Any related medical history: ")
+results = input("Any other lab data or results(Give related units): ")
+
+report = f'Severity: {level}({scale}/10).'
+
+report += f"Symptoms: {final_symptoms} "
+
+report += f"for {duration} days. Patiet's medical history: {history}. Lab results: {results}"
+
+lab_pattern = re.compile(r'(\w[\w\s]*):\s*(\d+\.?\d*)\s*(\w+)?')
+
+# Use finditer() to find all non-overlapping matches
+yesOrNo = input("Would you like to upload any medical files with lab data.(YES or NO): ")
+if yesOrNo.lower() == "yes":
+    print("Waiting for file selection...")
+    selected_file_path = upload_file_from_dialog()
+
+    if selected_file_path:
+        print(f"\nFile selected: {selected_file_path}")
+
+        # You can now open and read the file using its path
+        # For example, to print the first few lines:
+        try:
+            with open(selected_file_path, 'r') as file:
+                    file_content = file.read()
+        except Exception as e:
+            print(f"Error reading file: {e}")
+    else:
+        print("File selection canceled.")
+
+lab_pattern = re.compile(r'(\w[\w\s]*):\s*(\d+\.?\d*)\s*(\w+)?')
+
+# Use finditer() to find all non-overlapping matches
+matches = lab_pattern.finditer(file_content)
+
+# Store the extracted lab results in a list of dictionaries
+lab_results = []
+for match in matches:
+    lab_name = match.group(1).strip()
+    lab_value = float(match.group(2))
+    lab_units = match.group(3) if match.group(3) else "N/A"
+
+    lab_results.append({
+        'name': lab_name,
+        'value': lab_value,
+        'units': lab_units
+    })
+
+#THESE WOULD BE THE OUTPUTS
+print(report)
+print("Extracted Lab Results:")
+for result in lab_results:
+    print(result)
